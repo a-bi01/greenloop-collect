@@ -76,7 +76,7 @@ const createDefaultState = (): GameState => ({
   school: 'Singapore Polytechnic',
   level: 3,
   points: 120,
-  userCoins: 500,
+  userCoins: 150000,
   currentStreakDays: 3,
   containersBorrowed: 12,
   containersReturned: 10,

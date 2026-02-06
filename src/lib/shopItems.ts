@@ -20,7 +20,7 @@ export const SHOP_ITEMS: ShopItem[] = [
   { id: 'grab-20', name: 'Grab $20 Voucher', category: 'external_voucher', price: 16000, description: 'Premium Grab voucher', emoji: '🚗', stockKey: 'grab-20', isPhysical: false },
 
   // SP Merch (Limited)
-  { id: 'sp-shirt', name: 'SP GreenLoop Shirt', category: 'sp_merch', price: 7000, description: 'Exclusive SP eco tee', emoji: '👕', stockKey: 'sp-shirt', isPhysical: true },
+  { id: 'sp-shirt', name: 'SP CLS Shirt', category: 'sp_merch', price: 7000, description: 'Exclusive SP eco tee', emoji: '👕', stockKey: 'sp-shirt', isPhysical: true },
   { id: 'sp-tote', name: 'SP Eco Tote Bag', category: 'sp_merch', price: 5000, description: 'Reusable canvas tote', emoji: '👜', stockKey: 'sp-tote', isPhysical: true },
   { id: 'sp-bottle', name: 'SP Water Bottle', category: 'sp_merch', price: 6000, description: 'Stainless steel bottle', emoji: '🍶', stockKey: 'sp-bottle', isPhysical: true },
 
