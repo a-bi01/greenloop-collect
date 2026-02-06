@@ -172,4 +172,75 @@
   .animate-streak {
     animation: streak-fire 1s ease-in-out infinite;
   }
+
+  /* Cosmetic Frames */
+  .cosmetic-frame-leaf {
+    border: 2.5px solid hsl(var(--primary));
+  }
+  .cosmetic-frame-eco {
+    border: 2.5px solid hsl(var(--eco-glow));
+  }
+  .cosmetic-frame-ocean {
+    border: 2.5px solid hsl(var(--rarity-rare));
+    box-shadow: 0 0 10px hsl(var(--rarity-rare) / 0.4);
+  }
+  .cosmetic-frame-neon {
+    border: 2.5px solid hsl(var(--primary));
+    box-shadow: 0 0 10px hsl(var(--primary) / 0.6), 0 0 20px hsl(var(--primary) / 0.3);
+  }
+  .cosmetic-frame-golden {
+    border: 3px solid hsl(var(--rarity-ssr));
+    box-shadow: 0 0 15px hsl(var(--rarity-ssr) / 0.5);
+    animation: cosmetic-golden-pulse 2s ease-in-out infinite;
+  }
+  .cosmetic-frame-cosmic {
+    border: 3px solid hsl(270 80% 60%);
+    box-shadow: 0 0 15px hsl(270 80% 60% / 0.5);
+    animation: cosmetic-hue-shift 3s linear infinite;
+  }
+  .cosmetic-frame-pixel {
+    border: 3px dashed hsl(var(--primary));
+  }
+  .cosmetic-frame-rainbow {
+    border: 3px solid hsl(0 80% 60%);
+    box-shadow: 0 0 6px hsl(0 80% 60% / 0.3), 0 0 6px hsl(120 80% 60% / 0.3), 0 0 6px hsl(240 80% 60% / 0.3);
+  }
+
+  /* Cosmetic Card Borders */
+  .cosmetic-border-green {
+    border: 2px solid hsl(var(--primary)) !important;
+  }
+  .cosmetic-border-dots {
+    border: 2px dashed hsl(var(--primary)) !important;
+  }
+  .cosmetic-border-rare {
+    border: 2px solid hsl(var(--rarity-rare)) !important;
+    box-shadow: 0 0 10px hsl(var(--rarity-rare) / 0.3);
+  }
+  .cosmetic-border-gradient {
+    box-shadow: 0 0 0 2px hsl(var(--primary)), 0 0 10px hsl(var(--primary) / 0.3);
+  }
+  .cosmetic-border-ssr {
+    border: 2px solid hsl(var(--rarity-ssr)) !important;
+    box-shadow: 0 0 15px hsl(var(--rarity-ssr) / 0.4);
+    animation: cosmetic-shimmer-border 2s ease-in-out infinite;
+  }
+  .cosmetic-border-golden {
+    border: 2px solid hsl(40 100% 50%) !important;
+    box-shadow: 0 0 15px hsl(40 100% 50% / 0.4);
+    animation: cosmetic-golden-pulse 2s ease-in-out infinite;
+  }
+
+  @keyframes cosmetic-golden-pulse {
+    0%, 100% { box-shadow: 0 0 12px hsl(40 100% 50% / 0.4); }
+    50% { box-shadow: 0 0 22px hsl(40 100% 50% / 0.7); }
+  }
+  @keyframes cosmetic-hue-shift {
+    0% { filter: hue-rotate(0deg); }
+    100% { filter: hue-rotate(360deg); }
+  }
+  @keyframes cosmetic-shimmer-border {
+    0%, 100% { box-shadow: 0 0 15px hsl(var(--rarity-ssr) / 0.4); }
+    50% { box-shadow: 0 0 25px hsl(var(--rarity-ssr) / 0.7); }
+  }
 }

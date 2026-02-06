@@ -2,28 +2,33 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useGameState } from '@/lib/gameState';
 import { getCollectibleById, ALL_COLLECTIBLES, Rarity, rarityBadgeClass } from '@/lib/collectibles';
+import { getCosmeticById, ALL_COSMETICS } from '@/lib/cosmetics';
 import CollectibleCard from '@/components/CollectibleCard';
-import { Grid3X3, Filter, ArrowLeftRight, QrCode } from 'lucide-react';
+import { Grid3X3, ArrowLeftRight, QrCode, Palette } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
-type RarityFilter = 'All' | Rarity;
+type ViewFilter = 'All' | Rarity | 'Cosmetics';
 
 const CollectionTab = () => {
   const { state, tradeCollectible } = useGameState();
-  const [filter, setFilter] = useState<RarityFilter>('All');
+  const [filter, setFilter] = useState<ViewFilter>('All');
   const [tradeDialogOpen, setTradeDialogOpen] = useState(false);
   const [selectedForTrade, setSelectedForTrade] = useState<string | null>(null);
   const [showTradeQR, setShowTradeQR] = useState(false);
 
-  const filters: RarityFilter[] = ['All', 'Common', 'Rare', 'SSR'];
+  const filters: ViewFilter[] = ['All', 'Common', 'Rare', 'SSR', 'Cosmetics'];
 
-  const filteredInventory = state.inventory.filter(item => {
+  const filteredInventory = filter === 'Cosmetics' ? [] : state.inventory.filter(item => {
     if (filter === 'All') return true;
     const c = getCollectibleById(item.collectibleId);
     return c?.rarity === filter;
   });
+
+  const ownedCosmetics = filter === 'Cosmetics'
+    ? state.cosmeticsOwned.map(id => getCosmeticById(id)).filter(Boolean)
+    : [];
 
   const totalCollected = state.inventory.length;
   const totalAvailable = ALL_COLLECTIBLES.length;
@@ -62,60 +67,93 @@ const CollectionTab = () => {
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1 }}
-        className="flex gap-2"
+        className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide"
       >
         {filters.map(f => (
           <button
             key={f}
             onClick={() => setFilter(f)}
-            className={`text-xs font-bold px-3 py-1.5 rounded-full transition-all ${
+            className={`text-xs font-bold px-3 py-1.5 rounded-full whitespace-nowrap transition-all ${
               filter === f
                 ? 'bg-primary text-primary-foreground'
                 : 'bg-secondary text-muted-foreground hover:bg-muted'
             }`}
           >
+            {f === 'Cosmetics' && <span className="mr-1">🎨</span>}
             {f}
           </button>
         ))}
       </motion.div>
 
-      {/* Grid */}
-      <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.15 }}
-        className="grid grid-cols-3 gap-3"
-      >
-        <AnimatePresence mode="popLayout">
-          {filteredInventory.map(item => {
-            const c = getCollectibleById(item.collectibleId);
-            if (!c) return null;
-            return (
-              <motion.div
-                key={item.collectibleId}
-                layout
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.8 }}
-              >
-                <CollectibleCard
-                  collectible={c}
-                  count={item.count}
-                  size="md"
-                  onClick={() => {
-                    if (item.count >= 2) {
-                      setSelectedForTrade(item.collectibleId);
-                      setTradeDialogOpen(true);
-                    }
-                  }}
-                />
-              </motion.div>
-            );
-          })}
-        </AnimatePresence>
-      </motion.div>
+      {/* Cosmetics View */}
+      {filter === 'Cosmetics' && (
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.15 }}
+        >
+          {ownedCosmetics.length === 0 ? (
+            <div className="text-center py-12 text-muted-foreground">
+              <Palette className="w-10 h-10 mx-auto mb-3 opacity-40" />
+              <p className="font-medium">No cosmetics yet!</p>
+              <p className="text-xs">Earn from gacha or buy from Shop</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-3 gap-3">
+              {ownedCosmetics.map(cos => cos && (
+                <div key={cos.id} className="bg-card border rounded-2xl p-3 flex flex-col items-center gap-1.5">
+                  <span className="text-3xl">{cos.emoji}</span>
+                  <h4 className="text-[10px] font-bold text-center text-card-foreground leading-tight">{cos.name}</h4>
+                  <span className={`text-[9px] font-semibold px-2 py-0.5 rounded-full ${rarityBadgeClass(cos.rarity)}`}>
+                    {cos.rarity}
+                  </span>
+                  <p className="text-[8px] text-muted-foreground capitalize">{cos.type.replace('_', ' ')}</p>
+                </div>
+              ))}
+            </div>
+          )}
+        </motion.div>
+      )}
 
-      {filteredInventory.length === 0 && (
+      {/* Collectibles Grid */}
+      {filter !== 'Cosmetics' && (
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.15 }}
+          className="grid grid-cols-3 gap-3"
+        >
+          <AnimatePresence mode="popLayout">
+            {filteredInventory.map(item => {
+              const c = getCollectibleById(item.collectibleId);
+              if (!c) return null;
+              return (
+                <motion.div
+                  key={item.collectibleId}
+                  layout
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.8 }}
+                >
+                  <CollectibleCard
+                    collectible={c}
+                    count={item.count}
+                    size="md"
+                    onClick={() => {
+                      if (item.count >= 2) {
+                        setSelectedForTrade(item.collectibleId);
+                        setTradeDialogOpen(true);
+                      }
+                    }}
+                  />
+                </motion.div>
+              );
+            })}
+          </AnimatePresence>
+        </motion.div>
+      )}
+
+      {filter !== 'Cosmetics' && filteredInventory.length === 0 && (
         <div className="text-center py-12 text-muted-foreground">
           <span className="text-4xl block mb-3">📦</span>
           <p className="font-medium">No collectibles yet!</p>
@@ -124,39 +162,41 @@ const CollectionTab = () => {
       )}
 
       {/* Trade Section */}
-      <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.2 }}
-        className="bg-card border rounded-2xl p-4 space-y-3"
-      >
-        <div className="flex items-center gap-2">
-          <ArrowLeftRight className="w-4 h-4 text-primary" />
-          <h3 className="font-bold text-sm">Trade Duplicates</h3>
-        </div>
-        <p className="text-xs text-muted-foreground">Tap any card with x2+ to start a trade</p>
-        <div className="flex gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            className="rounded-xl text-xs"
-            onClick={() => {
-              setShowTradeQR(true);
-              toast.success('Trade QR Generated! 📱');
-            }}
-          >
-            <QrCode className="w-3.5 h-3.5 mr-1" /> Generate Trade QR
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            className="rounded-xl text-xs"
-            onClick={() => toast.info('Simulated: Scanning trade QR... 📷')}
-          >
-            Scan Trade QR
-          </Button>
-        </div>
-      </motion.div>
+      {filter !== 'Cosmetics' && (
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          className="bg-card border rounded-2xl p-4 space-y-3"
+        >
+          <div className="flex items-center gap-2">
+            <ArrowLeftRight className="w-4 h-4 text-primary" />
+            <h3 className="font-bold text-sm">Trade Duplicates</h3>
+          </div>
+          <p className="text-xs text-muted-foreground">Tap any card with x2+ to start a trade</p>
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              className="rounded-xl text-xs"
+              onClick={() => {
+                setShowTradeQR(true);
+                toast.success('Trade QR Generated! 📱');
+              }}
+            >
+              <QrCode className="w-3.5 h-3.5 mr-1" /> Generate Trade QR
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              className="rounded-xl text-xs"
+              onClick={() => toast.info('Simulated: Scanning trade QR... 📷')}
+            >
+              Scan Trade QR
+            </Button>
+          </div>
+        </motion.div>
+      )}
 
       {/* Trade QR Display */}
       {showTradeQR && (
