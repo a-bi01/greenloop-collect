@@ -1,14 +1,13 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { useGameState } from '@/lib/gameState';
-import { Collectible } from '@/lib/collectibles';
+import { useGameState, GachaResult } from '@/lib/gameState';
 import { toast } from 'sonner';
 import { QrCode, ArrowDownToLine, ArrowUpFromLine } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 
 interface ScanTabProps {
-  onGachaReveal: (collectible: Collectible) => void;
+  onGachaReveal: (result: GachaResult) => void;
 }
 
 const ScanTab = ({ onGachaReveal }: ScanTabProps) => {
@@ -25,13 +24,13 @@ const ScanTab = ({ onGachaReveal }: ScanTabProps) => {
   };
 
   const handleReturn = () => {
-    const collectible = returnContainer();
+    const result = returnContainer();
     setLastAction('return');
     toast.success('Return Confirmed 🎉', {
-      description: '+10 points! Opening Blind Box...',
+      description: `+10 points${result.bonus.coins ? ` +${result.bonus.coins} coins` : ''}! Opening Blind Box...`,
     });
     setTimeout(() => {
-      onGachaReveal(collectible);
+      onGachaReveal(result);
     }, 800);
   };
 

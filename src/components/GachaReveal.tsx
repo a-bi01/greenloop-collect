@@ -2,13 +2,17 @@ import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import confetti from 'canvas-confetti';
 import { Collectible, rarityBadgeClass, rarityGlowClass } from '@/lib/collectibles';
+import { BonusReward } from '@/lib/gameState';
+import { Button } from '@/components/ui/button';
 
 interface GachaRevealProps {
   collectible: Collectible;
+  bonus: BonusReward;
   onClose: () => void;
+  onNavigate?: (view: string) => void;
 }
 
-const GachaReveal = ({ collectible, onClose }: GachaRevealProps) => {
+const GachaReveal = ({ collectible, bonus, onClose, onNavigate }: GachaRevealProps) => {
   const [phase, setPhase] = useState<'shake' | 'burst' | 'reveal'>('shake');
 
   useEffect(() => {
@@ -38,6 +42,11 @@ const GachaReveal = ({ collectible, onClose }: GachaRevealProps) => {
       }
     }
   }, [phase, collectible.rarity]);
+
+  const handleNavigate = (view: string) => {
+    onClose();
+    setTimeout(() => onNavigate?.(view), 100);
+  };
 
   return (
     <motion.div
@@ -77,30 +86,76 @@ const GachaReveal = ({ collectible, onClose }: GachaRevealProps) => {
             initial={{ rotateY: 180, scale: 0.3, opacity: 0 }}
             animate={{ rotateY: 0, scale: 1, opacity: 1 }}
             transition={{ type: 'spring', damping: 15, stiffness: 200 }}
-            className="flex flex-col items-center gap-5"
+            className="flex flex-col items-center gap-4"
+            onClick={(e) => e.stopPropagation()}
           >
+            {/* Collectible Card */}
             <div
-              className={`w-56 h-72 rounded-3xl bg-card border-2 flex flex-col items-center justify-center gap-3 p-6 ${rarityGlowClass(collectible.rarity)}`}
+              className={`w-52 h-64 rounded-3xl bg-card border-2 flex flex-col items-center justify-center gap-2 p-5 ${rarityGlowClass(collectible.rarity)}`}
             >
               <span className={`text-xs font-bold px-3 py-1 rounded-full ${rarityBadgeClass(collectible.rarity)}`}>
                 {collectible.rarity}
               </span>
-              <span className="text-7xl">{collectible.emoji}</span>
-              <h3 className="text-lg font-bold text-center text-card-foreground">{collectible.name}</h3>
-              <p className="text-xs text-muted-foreground">{collectible.series}</p>
-              {collectible.reward && (
-                <div className="reward-gradient rounded-lg px-3 py-1.5 mt-1">
-                  <p className="text-xs font-semibold text-accent-foreground">🎁 {collectible.reward}</p>
-                </div>
-              )}
+              <span className="text-6xl">{collectible.emoji}</span>
+              <h3 className="text-base font-bold text-center text-card-foreground">{collectible.name}</h3>
+              <p className="text-[10px] text-muted-foreground">{collectible.series}</p>
             </div>
-            <motion.p
+
+            {/* Bonus Reward Summary */}
+            <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3 }}
-              className="text-primary-foreground/80 text-sm font-medium"
+              className="bg-card/90 backdrop-blur rounded-2xl px-5 py-3 text-center max-w-[240px]"
             >
-              Tap anywhere to continue
+              <p className="text-sm font-bold text-foreground">{bonus.description}</p>
+              {bonus.coins && (
+                <p className="text-xs text-accent mt-1">🪙 +{bonus.coins} coins added</p>
+              )}
+            </motion.div>
+
+            {/* Quick Links */}
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5 }}
+              className="flex gap-2 flex-wrap justify-center"
+            >
+              <Button
+                size="sm"
+                variant="outline"
+                className="rounded-xl text-xs bg-card/80"
+                onClick={() => handleNavigate('collection')}
+              >
+                📦 Collection
+              </Button>
+              {(bonus.type === 'sticker_pack_voucher' || bonus.type === 'external_voucher') && (
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="rounded-xl text-xs bg-card/80"
+                  onClick={() => handleNavigate('redemptions')}
+                >
+                  🎫 Redemption
+                </Button>
+              )}
+              <Button
+                size="sm"
+                variant="outline"
+                className="rounded-xl text-xs bg-card/80"
+                onClick={() => handleNavigate('shop')}
+              >
+                🛍️ Shop
+              </Button>
+            </motion.div>
+
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.7 }}
+              className="text-primary-foreground/60 text-[10px] font-medium"
+            >
+              Tap background to close
             </motion.p>
           </motion.div>
         )}

@@ -6,7 +6,6 @@ export interface Collectible {
   emoji: string;
   rarity: Rarity;
   series: string;
-  reward?: string;
 }
 
 export const ALL_COLLECTIBLES: Collectible[] = [
@@ -19,13 +18,13 @@ export const ALL_COLLECTIBLES: Collectible[] = [
   { id: 'roti-prata-ranger', name: 'Roti Prata Ranger', emoji: '🫓', rarity: 'Common', series: 'SP Hawkerverse S1' },
   { id: 'ice-kachang-yeti', name: 'Ice Kachang Yeti', emoji: '🍧', rarity: 'Common', series: 'SP Hawkerverse S1' },
   // Rare (3)
-  { id: 'golden-otter', name: 'Golden Otter', emoji: '🦦', rarity: 'Rare', series: 'SP Eco Legends', reward: '$1 Add-on Voucher' },
-  { id: 'techno-tofu', name: 'Techno Tofu', emoji: '🤖', rarity: 'Rare', series: 'SP Eco Legends', reward: '$1 Add-on Voucher' },
-  { id: 'recycling-raptor', name: 'Recycling Raptor', emoji: '🦖', rarity: 'Rare', series: 'SP Eco Legends', reward: '$1 Add-on Voucher' },
+  { id: 'golden-otter', name: 'Golden Otter', emoji: '🦦', rarity: 'Rare', series: 'SP Eco Legends' },
+  { id: 'techno-tofu', name: 'Techno Tofu', emoji: '🤖', rarity: 'Rare', series: 'SP Eco Legends' },
+  { id: 'recycling-raptor', name: 'Recycling Raptor', emoji: '🦖', rarity: 'Rare', series: 'SP Eco Legends' },
   // SSR (3)
-  { id: 'legendary-kopi-king', name: 'Legendary Kopi King', emoji: '👑', rarity: 'SSR', series: 'SP Mythics', reward: 'Queue Skip Pass' },
-  { id: 'cyber-chicken-rice', name: 'Cyber Chicken Rice SSR', emoji: '🐔', rarity: 'SSR', series: 'SP Mythics', reward: 'Free Drink Upgrade' },
-  { id: 'ultra-green-guardian', name: 'Ultra Green Guardian', emoji: '🦸', rarity: 'SSR', series: 'SP Mythics', reward: 'Queue Skip Pass' },
+  { id: 'legendary-kopi-king', name: 'Legendary Kopi King', emoji: '👑', rarity: 'SSR', series: 'SP Mythics' },
+  { id: 'cyber-chicken-rice', name: 'Cyber Chicken Rice SSR', emoji: '🐔', rarity: 'SSR', series: 'SP Mythics' },
+  { id: 'ultra-green-guardian', name: 'Ultra Green Guardian', emoji: '🦸', rarity: 'SSR', series: 'SP Mythics' },
 ];
 
 export const getCollectibleById = (id: string): Collectible | undefined =>

@@ -1,29 +1,57 @@
 import { motion } from 'framer-motion';
 import { useGameState } from '@/lib/gameState';
 import { getCollectibleById, MOCK_LEADERBOARD } from '@/lib/collectibles';
+import { getCosmeticById } from '@/lib/cosmetics';
 import CollectibleCard from '@/components/CollectibleCard';
-import { Zap, Flame, Leaf, Trophy } from 'lucide-react';
+import AvatarWithFrame from '@/components/AvatarWithFrame';
+import { Zap, Flame, Leaf, Trophy, Coins, ShoppingBag } from 'lucide-react';
 
-const HomeTab = () => {
+interface HomeTabProps {
+  onNavigate?: (view: string) => void;
+}
+
+const HomeTab = ({ onNavigate }: HomeTabProps) => {
   const { state } = useGameState();
 
   const streakMilestone = Math.ceil((state.currentStreakDays + 1) / 7) * 7;
   const streakProgress = ((state.currentStreakDays % 7) / 7) * 100;
 
+  const equippedTitle = state.equippedCosmetics.titleId
+    ? getCosmeticById(state.equippedCosmetics.titleId)
+    : null;
+  const equippedBadges = state.equippedCosmetics.badgeIds
+    .map(getCosmeticById)
+    .filter(Boolean);
+  const profileBorder = state.equippedCosmetics.profileBorderId
+    ? getCosmeticById(state.equippedCosmetics.profileBorderId)
+    : null;
+
   return (
     <div className="px-4 py-6 space-y-5">
-      {/* Header */}
+      {/* Header with Avatar */}
       <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}>
-        <div className="flex items-center gap-2 mb-1">
-          <span className="text-2xl animate-float">🌿</span>
-          <h1 className="text-xl font-extrabold text-foreground tracking-tight">GreenLoop</h1>
-          <span className="text-xs font-semibold bg-primary/10 text-primary px-2 py-0.5 rounded-full ml-auto">
-            Lv.{state.level}
-          </span>
+        <div className="flex items-center gap-3 mb-1">
+          <AvatarWithFrame size="sm" />
+          <div className="flex-1">
+            <div className="flex items-center gap-2">
+              <h1 className="text-xl font-extrabold text-foreground tracking-tight">GreenLoop</h1>
+              <span className="text-xs font-semibold bg-primary/10 text-primary px-2 py-0.5 rounded-full ml-auto">
+                Lv.{state.level}
+              </span>
+            </div>
+            <div className="flex items-center gap-1">
+              <p className="text-sm text-muted-foreground">
+                Hey {state.userName}! 🔥
+              </p>
+              {equippedBadges.map(b => b && (
+                <span key={b.id} className="text-xs">{b.emoji}</span>
+              ))}
+            </div>
+            {equippedTitle && (
+              <p className="text-[10px] font-semibold text-primary">{equippedTitle.titleText}</p>
+            )}
+          </div>
         </div>
-        <p className="text-sm text-muted-foreground">
-          Hey {state.userName}! Keep the streak going 🔥
-        </p>
       </motion.div>
 
       {/* Today's Impact */}
@@ -31,7 +59,7 @@ const HomeTab = () => {
         <h2 className="text-base font-bold mb-3 flex items-center gap-2">
           <Zap className="w-4 h-4 text-primary" /> Today's Impact
         </h2>
-        <div className="grid grid-cols-2 gap-3">
+        <div className={`grid grid-cols-2 gap-3 ${profileBorder?.cssClass || ''} rounded-2xl`}>
           {/* Containers Returned */}
           <div className="bg-card border rounded-2xl p-4 space-y-1">
             <div className="flex items-center gap-2">
@@ -59,6 +87,46 @@ const HomeTab = () => {
         </div>
       </motion.div>
 
+      {/* Coins + Points Row */}
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.15 }}
+        className="grid grid-cols-2 gap-3"
+      >
+        <div className="reward-gradient rounded-2xl p-4 border">
+          <div className="flex items-center gap-2">
+            <Coins className="w-5 h-5 text-accent" />
+            <span className="text-2xl font-extrabold text-foreground">{state.userCoins.toLocaleString()}</span>
+          </div>
+          <p className="text-xs text-muted-foreground font-medium">Coins 🪙</p>
+        </div>
+        <div className="reward-gradient rounded-2xl p-4 border">
+          <div className="flex items-center gap-2">
+            <span className="text-lg">⭐</span>
+            <span className="text-2xl font-extrabold text-foreground">{state.points}</span>
+          </div>
+          <p className="text-xs text-muted-foreground font-medium">Points</p>
+        </div>
+      </motion.div>
+
+      {/* Shop Banner */}
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.18 }}
+      >
+        <button
+          onClick={() => onNavigate?.('shop')}
+          className="w-full bg-primary/10 border border-primary/20 rounded-2xl p-3 flex items-center gap-3 hover:bg-primary/15 transition-colors"
+        >
+          <ShoppingBag className="w-5 h-5 text-primary" />
+          <p className="text-xs font-semibold text-foreground text-left">
+            Save coins to redeem merch / $10 vouchers in <span className="text-primary">Shop</span> →
+          </p>
+        </button>
+      </motion.div>
+
       {/* Eco Impact */}
       <motion.div
         initial={{ opacity: 0, y: 10 }}
@@ -77,23 +145,9 @@ const HomeTab = () => {
         </div>
       </motion.div>
 
-      {/* Points */}
-      <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.25 }}
-        className="reward-gradient rounded-2xl p-4 border flex items-center justify-between"
-      >
-        <div>
-          <p className="text-xs text-muted-foreground font-medium">Points Balance</p>
-          <p className="text-2xl font-extrabold text-foreground">{state.points} <span className="text-sm font-semibold text-accent">pts</span></p>
-        </div>
-        <span className="text-3xl">⭐</span>
-      </motion.div>
-
       {/* Recent Pulls */}
       {state.recentPulls.length > 0 && (
-        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }}>
           <h3 className="text-sm font-bold mb-2">Recent Pulls</h3>
           <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
             {state.recentPulls.map((id, i) => {
@@ -109,7 +163,7 @@ const HomeTab = () => {
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.35 }}
+        transition={{ delay: 0.3 }}
         className="bg-card border rounded-2xl p-4"
       >
         <div className="flex items-center gap-2 mb-2">
@@ -124,7 +178,7 @@ const HomeTab = () => {
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.4 }}
+        transition={{ delay: 0.35 }}
         className="bg-card border rounded-2xl p-4"
       >
         <div className="flex items-center gap-2 mb-3">
