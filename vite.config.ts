@@ -9,7 +9,7 @@ export default defineConfig(({ mode }) => ({
   host: "::",
   port: 8080,
   allowedHosts: [
-    "greenloop-collect.onrender.com"
+    "greenloop-collect-2.onrender.com"
   ],
   hmr: {
     overlay: false,
